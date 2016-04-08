@@ -14,12 +14,8 @@ import org.jnativehook.keyboard.NativeKeyListener;
  *
  * @author jgavilan
  */
-public abstract class MultipleNativeKeyListener implements NativeKeyListener{
-    private final static Set<KeyboardKey> EVENT_LIST = new HashSet<>();
-
-    public static Set<KeyboardKey> getEventList() {
-        return EVENT_LIST;
-    }
+public interface MultipleNativeKeyListener extends NativeKeyListener{
+    public final static Set<KeyboardKey> EVENT_LIST = new HashSet<>();
 
     public static void addNativeKeyEvent(NativeKeyEvent event) {
         EVENT_LIST.add(KeyboardKey.getKey(event));
@@ -40,18 +36,18 @@ public abstract class MultipleNativeKeyListener implements NativeKeyListener{
     public abstract void keyPressed(NativeKeyEvent e);
 
     @Override
-    public void nativeKeyTyped(NativeKeyEvent e){
+    public default void nativeKeyTyped(NativeKeyEvent e){
         keyTyped(e);
     }
 
     @Override
-    public void nativeKeyReleased(NativeKeyEvent e){
+    public default void nativeKeyReleased(NativeKeyEvent e){
         keyReleased(e);
         removeNativeKeyEvent(e);
     }
 
     @Override
-    public void nativeKeyPressed(NativeKeyEvent e){
+    public default void nativeKeyPressed(NativeKeyEvent e){
         addNativeKeyEvent(e);
         keyPressed(e);
     }
