@@ -16,7 +16,7 @@ import org.jnativehook.keyboard.NativeKeyListener;
  */
 public interface MultipleNativeKeyListener extends NativeKeyListener{
     public final static Set<KeyboardKey> EVENT_LIST = new HashSet<>();
-
+    
     public static void addNativeKeyEvent(NativeKeyEvent event) {
         EVENT_LIST.add(KeyboardKey.getKey(event));
     }

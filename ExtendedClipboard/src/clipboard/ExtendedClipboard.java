@@ -17,16 +17,21 @@ import java.util.List;
  */
 public class ExtendedClipboard {
     
-    private final static Clipboard DEFAULT_CLIPBOARD;
-    private final static LinkedList<Transferable> PILA;
+    private static Clipboard DEFAULT_CLIPBOARD;
+    private static LinkedList<Transferable> PILA;
     private static int repeaterGet;
     
     static{
-        PILA = new LinkedList();
-        DEFAULT_CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+        reset();
     }
     
     private ExtendedClipboard() {
+    }
+    
+    public final static void reset(){
+        PILA = new LinkedList();
+        DEFAULT_CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+        repeaterGet = 0;
     }
 
     public static void setContents() throws InterruptedException{
