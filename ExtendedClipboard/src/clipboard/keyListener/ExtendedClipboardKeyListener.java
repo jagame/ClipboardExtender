@@ -8,7 +8,6 @@ package clipboard.keyListener;
 import clipboard.ExtendedClipboard;
 import extendedNativeHook.KeyboardKey;
 import extendedNativeHook.MultipleNativeKeyListener;
-import static extendedNativeHook.MultipleNativeKeyListener.EVENT_LIST;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -17,7 +16,7 @@ import org.jnativehook.keyboard.NativeKeyEvent;
  *
  * @author jgavilan
  */
-public class ExtendedClipboardKeyListener implements MultipleNativeKeyListener{
+public class ExtendedClipboardKeyListener extends MultipleNativeKeyListener{
     
             @Override
             public void keyTyped(NativeKeyEvent e) {
@@ -31,7 +30,7 @@ public class ExtendedClipboardKeyListener implements MultipleNativeKeyListener{
             @Override
             public void keyPressed(NativeKeyEvent e) {
                 try{
-                    if( MultipleNativeKeyListener.getNumTeclasPulsadas() > 1 ){
+                    if( getNumTeclasPulsadas() > 1 ){
                         if( isControlPressed() ){
                             if( isPressed(KeyboardKey.C) )
                                 ExtendedClipboard.setContents();
