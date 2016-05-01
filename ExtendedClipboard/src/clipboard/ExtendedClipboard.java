@@ -19,7 +19,7 @@ public class ExtendedClipboard {
     
     private static Clipboard DEFAULT_CLIPBOARD;
     private static LinkedList<Transferable> PILA;
-    private static int repeaterGet;
+    private static Transferable cache;
     
     static{
         reset();
@@ -31,54 +31,48 @@ public class ExtendedClipboard {
     public final static void reset(){
         PILA = new LinkedList();
         DEFAULT_CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
-        repeaterGet = 0;
     }
 
     public static void setContents() throws InterruptedException{
-        Thread.sleep(100);// Dejamos tiempo suficiente para que el Portapapeles del SO haga sus operaciones
+        Thread.sleep(150);// Dejamos tiempo suficiente para que el Portapapeles del SO haga sus operaciones
         
-        Transferable content;
+        PILA.add(getClipboardContents());
+        if( cache == null )
+            cache = PILA.pop();
+        setClipboardContents(cache);
+    }
+
+    public static void getContents() throws InterruptedException{
+        Thread.sleep(150);// Dejamos tiempo suficiente para que el Portapapeles del SO haga sus operaciones
+        
+        if( ! PILA.isEmpty() ){
+            cache = PILA.pop();
+            setClipboardContents(cache);
+        }else{
+            cache = null;
+        }
+    }
+    
+    private static Transferable getClipboardContents(){
+        Transferable content = null;
         
         try{
             content = DEFAULT_CLIPBOARD.getContents(null);
-            // obtenemos el contenido del Clipboard
-
-            PILA.add( content );
-            //Añadimos el contenido a la cola
-
-            content = PILA.peek();
-            //Obtenemos el primer elemento de la cola sin eliminarlo
-
-            DEFAULT_CLIPBOARD.setContents(content, null);
-            //Asignamos al Clipboard el primer elemento de la cola
-        }catch(IllegalStateException e){
-            setContents();
-            // Despues de copiar todos los elementos si queremos volver a copiar contenido al portapapeles da error IllegalStateException la primera vez.
-            // Basta con ejecutarlo una segunda vez para que ya si, funcione correctamente
+        }catch( IllegalStateException ex ){
+            System.out.println("Error obteniendo contenido del Clipboard, volviendo a intentar");
+            getClipboardContents();
         }
-        
-        repeaterGet=0;
-    }
-
-    public static Transferable getContents() throws InterruptedException{
-        Thread.sleep(100);// Dejamos tiempo suficiente para que el Portapapeles del SO haga sus operaciones
-        
-        Transferable content;
-        content = DEFAULT_CLIPBOARD.getContents(null); // Se almacena el content (por si quiere ser gestionado)
-        
-        if( repeaterGet > 0 && PILA.size() > 0 )
-            DEFAULT_CLIPBOARD.setContents(PILA.pop(), null);
-        // Si el get ha sido repetido varias veces se devuelve el primer elemento de la pila
-        else if( PILA.size() > 0 ){
-            PILA.pop();
-            DEFAULT_CLIPBOARD.setContents(PILA.pop(), null);
-            // Si el get no ha sido repetido varias veces se descarta el primer elemento de la pila (ya que es el que actualmente está en el Clipboard y ya ha sido imprimido)
-            // y se asigna el siguiente que se querrá devolver
-        }
-        
-        repeaterGet++;
         
         return content;
+    }
+    
+    private static void setClipboardContents(Transferable content){
+        try{
+            DEFAULT_CLIPBOARD.setContents(content,null);
+        }catch( IllegalStateException ex ){
+            System.out.println("Error asignando contenido al Clipboard, volviendo a intentar");
+            setClipboardContents(content);
+        }
     }
     
     public List<Transferable> getElementsCopy(){
